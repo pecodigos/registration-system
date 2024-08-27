@@ -44,8 +44,11 @@ public class StudentController {
     @GetMapping("/students/{id}")
     public ResponseEntity<Object> getOneStudent(@PathVariable(value = "id") UUID id) {
         Optional<StudentEntity> studentO = studentRepository.findById(id);
-        return studentO.<ResponseEntity<Object>>map(studentEntity -> ResponseEntity.status(HttpStatus.OK).body(studentEntity))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Student not found."));
+        if (studentO.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Student not found.");
+        }
+        studentO.get().add(linkTo(methodOn(StudentController.class).getAllStudents()).withSelfRel());
+        return ResponseEntity.status(HttpStatus.OK).body(studentO.get());
     }
 
     @PutMapping("/students/{id}")
