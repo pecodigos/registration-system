@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 @RestController
 public class StudentController {
 
@@ -29,7 +32,13 @@ public class StudentController {
 
     @GetMapping("/students")
     public ResponseEntity<List<StudentEntity>> getAllStudents() {
-        return ResponseEntity.status(HttpStatus.OK).body(studentRepository.findAll());
+        List<StudentEntity> studentsList = studentRepository.findAll();
+        if (!studentsList.isEmpty()) {
+            for (StudentEntity student : studentsList) {
+                student.add(linkTo(methodOn(StudentController.class).getOneStudent(student.getId())).withSelfRel());
+            }
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(studentsList);
     }
 
     @GetMapping("/students/{id}")
