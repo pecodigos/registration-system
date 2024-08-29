@@ -8,9 +8,13 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class AnswerController {
@@ -23,5 +27,26 @@ public class AnswerController {
         var answerEntity = new AnswerEntity();
         BeanUtils.copyProperties(answerDTO, answerEntity);
         return ResponseEntity.status(HttpStatus.CREATED).body(answerRepository.save(answerEntity));
+    }
+
+    @GetMapping("/answers")
+    public ResponseEntity <List<AnswerEntity>> getAllAnswers() {
+        List<AnswerEntity> answersList = answerRepository.findAll();
+        if (!answersList.isEmpty()) {
+            for (AnswerEntity answer : answersList) {
+                answer.add(linkTo(methodOn(AnswerController.class).getOneAnswer(answer.getId())).withSelfRel());
+            }
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(answersList);
+    }
+
+    @GetMapping("/answers/{id}")
+    public ResponseEntity<Object> getOneAnswer(@PathVariable(value="id") Long id) {
+        Optional<AnswerEntity> optionalAnswer = answerRepository.findById(id);
+        if(optionalAnswer.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Answer not found.");
+        }
+        optionalAnswer.get().add(linkTo(methodOn(AnswerController.class).getAllAnswers()).withSelfRel());
+        return ResponseEntity.status(HttpStatus.OK).body(optionalAnswer.get());
     }
 }

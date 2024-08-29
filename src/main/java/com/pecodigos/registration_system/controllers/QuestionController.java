@@ -8,9 +8,13 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 public class QuestionController {
@@ -23,5 +27,26 @@ public class QuestionController {
         var questionEntity = new QuestionEntity();
         BeanUtils.copyProperties(questionDTO, questionEntity);
         return ResponseEntity.status(HttpStatus.CREATED).body(questionRepository.save(questionEntity));
+    }
+
+    @GetMapping("/questions")
+    public ResponseEntity<List<QuestionEntity>> getAllQuestions() {
+        List<QuestionEntity> questionsList = questionRepository.findAll();
+        if (!questionsList.isEmpty()) {
+            for (QuestionEntity question : questionsList) {
+                question.add(linkTo(methodOn(QuestionController.class).getOneQuestion(question.getId())).withSelfRel());
+            }
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(questionsList);
+    }
+
+    @GetMapping("/questions/{id}")
+    public ResponseEntity<Object> getOneQuestion(@PathVariable(value = "id") Long id) {
+        Optional<QuestionEntity> optionalQuestion = questionRepository.findById(id);
+        if(optionalQuestion.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Question not found.");
+        }
+        optionalQuestion.get().add(linkTo(methodOn(QuestionController.class).getAllQuestions()).withSelfRel());
+        return ResponseEntity.status(HttpStatus.OK).body(optionalQuestion.get());
     }
 }
