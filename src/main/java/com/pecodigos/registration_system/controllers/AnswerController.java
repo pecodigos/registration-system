@@ -52,7 +52,7 @@ public class AnswerController {
     }
 
     @PutMapping("/answers/{id}")
-    public ResponseEntity<Object> updateQuestion(@PathVariable(value = "id") Long id,
+    public ResponseEntity<Object> updateAnswer(@PathVariable(value = "id") Long id,
                                                  @RequestBody @Valid AnswerDTO answerDTO) {
         Optional<AnswerEntity> optionalAnswer = answerRepository.findById(id);
         if (optionalAnswer.isEmpty()) {
@@ -61,5 +61,15 @@ public class AnswerController {
         var answerEntity = optionalAnswer.get();
         BeanUtils.copyProperties(answerDTO, answerEntity);
         return ResponseEntity.status(HttpStatus.OK).body(answerRepository.save(answerEntity));
+    }
+
+    @DeleteMapping("/answers/{id}")
+    public ResponseEntity<Object> deleteAnswer (@PathVariable(value = "id") Long id) {
+        Optional<AnswerEntity> optionalAnswer = answerRepository.findById(id);
+        if (optionalAnswer.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Answer not found.");
+        }
+        answerRepository.delete(optionalAnswer.get());
+        return ResponseEntity.status(HttpStatus.OK).body("Answer was deleted successfully.");
     }
 }

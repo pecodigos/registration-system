@@ -70,6 +70,6 @@ public class StudentController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Student not found.");
         }
         studentRepository.delete(studentO.get());
-        return ResponseEntity.status(HttpStatus.OK).body("Product deleted successfully.");
+        return ResponseEntity.status(HttpStatus.OK).body("Student was deleted successfully.");
     }
 }

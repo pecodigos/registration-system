@@ -49,4 +49,26 @@ public class QuestionController {
         optionalQuestion.get().add(linkTo(methodOn(QuestionController.class).getAllQuestions()).withSelfRel());
         return ResponseEntity.status(HttpStatus.OK).body(optionalQuestion.get());
     }
+
+    @PutMapping("/questions/{id}")
+    public ResponseEntity<Object> updateQuestion(@PathVariable(value = "id") Long id,
+                                                 @RequestBody @Valid QuestionDTO questionDTO) {
+        Optional<QuestionEntity> optionalQuestion = questionRepository.findById(id);
+        if (optionalQuestion.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Question not found.");
+        }
+        var questionEntity = optionalQuestion.get();
+        BeanUtils.copyProperties(questionDTO, questionEntity);
+        return ResponseEntity.status(HttpStatus.OK).body(questionRepository.save(questionEntity));
+    }
+
+    @DeleteMapping("/questions/{id}")
+    public ResponseEntity<Object> deleteQuestion(@PathVariable(value = "id") Long id) {
+        Optional<QuestionEntity> optionalQuestion = questionRepository.findById(id);
+        if (optionalQuestion.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Question not found.");
+        }
+        questionRepository.delete(optionalQuestion.get());
+        return ResponseEntity.status(HttpStatus.OK).body("Question deleted successfully.");
+    }
 }
