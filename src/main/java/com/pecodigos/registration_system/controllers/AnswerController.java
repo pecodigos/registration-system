@@ -1,6 +1,7 @@
 package com.pecodigos.registration_system.controllers;
 
 import com.pecodigos.registration_system.dtos.AnswerDTO;
+import com.pecodigos.registration_system.dtos.QuestionDTO;
 import com.pecodigos.registration_system.entities.AnswerEntity;
 import com.pecodigos.registration_system.repositories.AnswerRepository;
 import jakarta.validation.Valid;
@@ -48,5 +49,17 @@ public class AnswerController {
         }
         optionalAnswer.get().add(linkTo(methodOn(AnswerController.class).getAllAnswers()).withSelfRel());
         return ResponseEntity.status(HttpStatus.OK).body(optionalAnswer.get());
+    }
+
+    @PutMapping("/answers/{id}")
+    public ResponseEntity<Object> updateQuestion(@PathVariable(value = "id") Long id,
+                                                 @RequestBody @Valid AnswerDTO answerDTO) {
+        Optional<AnswerEntity> optionalAnswer = answerRepository.findById(id);
+        if (optionalAnswer.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Answer not found.");
+        }
+        var answerEntity = optionalAnswer.get();
+        BeanUtils.copyProperties(answerDTO, answerEntity);
+        return ResponseEntity.status(HttpStatus.OK).body(answerRepository.save(answerEntity));
     }
 }
