@@ -1,7 +1,6 @@
 package com.pecodigos.registration_system.controllers;
 
 import com.pecodigos.registration_system.dtos.AnswerDTO;
-import com.pecodigos.registration_system.dtos.QuestionDTO;
 import com.pecodigos.registration_system.entities.AnswerEntity;
 import com.pecodigos.registration_system.repositories.AnswerRepository;
 import jakarta.validation.Valid;
@@ -18,19 +17,20 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
+@RequestMapping("/answers")
 public class AnswerController {
 
     @Autowired
     AnswerRepository answerRepository;
 
-    @PostMapping("/answers")
+    @PostMapping("/")
     public ResponseEntity<AnswerEntity> saveAnswer(@RequestBody @Valid AnswerDTO answerDTO) {
         var answerEntity = new AnswerEntity();
         BeanUtils.copyProperties(answerDTO, answerEntity);
         return ResponseEntity.status(HttpStatus.CREATED).body(answerRepository.save(answerEntity));
     }
 
-    @GetMapping("/answers")
+    @GetMapping("/")
     public ResponseEntity <List<AnswerEntity>> getAllAnswers() {
         List<AnswerEntity> answersList = answerRepository.findAll();
         if (!answersList.isEmpty()) {
@@ -41,7 +41,7 @@ public class AnswerController {
         return ResponseEntity.status(HttpStatus.OK).body(answersList);
     }
 
-    @GetMapping("/answers/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Object> getOneAnswer(@PathVariable(value="id") Long id) {
         Optional<AnswerEntity> optionalAnswer = answerRepository.findById(id);
         if(optionalAnswer.isEmpty()) {
@@ -51,7 +51,7 @@ public class AnswerController {
         return ResponseEntity.status(HttpStatus.OK).body(optionalAnswer.get());
     }
 
-    @PutMapping("/answers/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Object> updateAnswer(@PathVariable(value = "id") Long id,
                                                  @RequestBody @Valid AnswerDTO answerDTO) {
         Optional<AnswerEntity> optionalAnswer = answerRepository.findById(id);
@@ -63,7 +63,7 @@ public class AnswerController {
         return ResponseEntity.status(HttpStatus.OK).body(answerRepository.save(answerEntity));
     }
 
-    @DeleteMapping("/answers/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Object> deleteAnswer (@PathVariable(value = "id") Long id) {
         Optional<AnswerEntity> optionalAnswer = answerRepository.findById(id);
         if (optionalAnswer.isEmpty()) {

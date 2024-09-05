@@ -23,10 +23,6 @@ public class QuestionEntity extends RepresentationModel<QuestionEntity> implemen
 
     private String question;
 
-    @ManyToOne
-    @JoinColumn(name = "student_id")
-    private StudentEntity student;
-
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AnswerEntity> answer = new ArrayList<>();
 }

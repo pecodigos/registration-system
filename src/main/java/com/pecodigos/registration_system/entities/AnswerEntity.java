@@ -22,10 +22,10 @@ public class AnswerEntity extends RepresentationModel<AnswerEntity> implements S
     private String answer;
 
     @ManyToOne
-    @JoinColumn(name = "student_id")
+    @JoinColumn(name = "student_id", nullable = false)
     private StudentEntity student;
 
     @ManyToOne
-    @JoinColumn(name = "question_id")
+    @JoinColumn(name = "question_id", nullable = false)
     private QuestionEntity question;
 }

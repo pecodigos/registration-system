@@ -17,19 +17,20 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
+@RequestMapping("/questions")
 public class QuestionController {
 
     @Autowired
     QuestionRepository questionRepository;
 
-    @PostMapping("/questions")
+    @PostMapping("/")
     public ResponseEntity<QuestionEntity> saveQuestion(@RequestBody @Valid QuestionDTO questionDTO) {
         var questionEntity = new QuestionEntity();
         BeanUtils.copyProperties(questionDTO, questionEntity);
         return ResponseEntity.status(HttpStatus.CREATED).body(questionRepository.save(questionEntity));
     }
 
-    @GetMapping("/questions")
+    @GetMapping("/")
     public ResponseEntity<List<QuestionEntity>> getAllQuestions() {
         List<QuestionEntity> questionsList = questionRepository.findAll();
         if (!questionsList.isEmpty()) {
@@ -40,7 +41,7 @@ public class QuestionController {
         return ResponseEntity.status(HttpStatus.OK).body(questionsList);
     }
 
-    @GetMapping("/questions/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Object> getOneQuestion(@PathVariable(value = "id") Long id) {
         Optional<QuestionEntity> optionalQuestion = questionRepository.findById(id);
         if(optionalQuestion.isEmpty()) {
@@ -50,7 +51,7 @@ public class QuestionController {
         return ResponseEntity.status(HttpStatus.OK).body(optionalQuestion.get());
     }
 
-    @PutMapping("/questions/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Object> updateQuestion(@PathVariable(value = "id") Long id,
                                                  @RequestBody @Valid QuestionDTO questionDTO) {
         Optional<QuestionEntity> optionalQuestion = questionRepository.findById(id);
@@ -62,7 +63,7 @@ public class QuestionController {
         return ResponseEntity.status(HttpStatus.OK).body(questionRepository.save(questionEntity));
     }
 
-    @DeleteMapping("/questions/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Object> deleteQuestion(@PathVariable(value = "id") Long id) {
         Optional<QuestionEntity> optionalQuestion = questionRepository.findById(id);
         if (optionalQuestion.isEmpty()) {
