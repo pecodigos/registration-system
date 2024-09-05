@@ -2,14 +2,18 @@ package com.pecodigos.registration_system.entities;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
 @Table(name = "tb_questions")
 public class QuestionEntity extends RepresentationModel<QuestionEntity> implements Serializable {
 
@@ -18,4 +22,11 @@ public class QuestionEntity extends RepresentationModel<QuestionEntity> implemen
     private Long id;
 
     private String question;
+
+    @ManyToOne
+    @JoinColumn(name = "student_id")
+    private StudentEntity student;
+
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AnswerEntity> answer = new ArrayList<>();
 }
